@@ -1,32 +1,32 @@
-package SimpArc;
+package lab06;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
 
-public class proc extends ViewableAtomic
+public class Router extends ViewableAtomic
 {
-  
-	protected entity job;
+	protected Job job;
 	protected double processing_time;
 
-	public proc()
+	public Router()
 	{
-		this("proc", 20);
+		this("router", 20);
 	}
 
-	public proc(String name, double Processing_time)
+	public Router(String name, double Processing_time)
 	{
 		super(name);
     
 		addInport("in");
-		addOutport("out");
+		addOutport("out1");
+		addOutport("out2");
 		
 		processing_time = Processing_time;
 	}
   
 	public void initialize()
 	{
-		job = new entity("");
+		job = new Job("");
 		
 		holdIn("passive", INFINITY);
 	}
@@ -40,9 +40,9 @@ public class proc extends ViewableAtomic
 			{
 				if (messageOnPort(x, "in", i))
 				{
-					job = (entity)x.getValOnPort("in", i);
+					job = (Job)x.getValOnPort("in", i);
 					
-					holdIn("busy", processing_time);
+					holdIn("sending", processing_time);
 				}
 			}
 		}
@@ -50,9 +50,9 @@ public class proc extends ViewableAtomic
   
 	public void deltint()
 	{
-		if (phaseIs("busy"))
+		if (phaseIs("sending"))
 		{
-			job = new entity("");
+			job = new Job("");
 			
 			holdIn("passive", INFINITY);
 		}
@@ -61,9 +61,12 @@ public class proc extends ViewableAtomic
 	public message out()
 	{
 		message m = new message();
-		if (phaseIs("busy"))
+		if (phaseIs("sending"))
 		{
-			m.add(makeContent("out", job));
+			if (job.jobFlag == 1)
+				m.add(makeContent("out1", job));
+			else if (job.jobFlag == 2)
+				m.add(makeContent("out2", job));
 		}
 		return m;
 	}

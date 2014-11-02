@@ -3,16 +3,23 @@ import GenCol.*;
 
 public class Job extends entity
 {   
-	final public static int VIDEO = 0;
-	final public static int IMAGE = 1;
-	final public static int AUDIO = 2;
-	final public static int OTHER = 3;
-	
-	public int type;
-	public int size;
+	char type;
+	double size;
 	
 	public Job(String name)
+	{  
+		this(name, 0.0, 'O');
+	}
+	
+	public Job(String name, double s)
 	{
-		super(name);  
+		this(name, s, 'O');
+	}
+	
+	public Job(String name, double s, char t)
+	{
+		super(name);
+		type = t;
+		size = s;
 	}
 }

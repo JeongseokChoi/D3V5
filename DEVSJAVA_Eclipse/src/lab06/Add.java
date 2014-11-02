@@ -1,20 +1,19 @@
-package SimpArc;
+package lab06;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
 
-public class proc extends ViewableAtomic
+public class Add extends ViewableAtomic
 {
-  
-	protected entity job;
+	protected Job job_in, job_out;
 	protected double processing_time;
 
-	public proc()
+	public Add()
 	{
-		this("proc", 20);
+		this("add", 20);
 	}
 
-	public proc(String name, double Processing_time)
+	public Add(String name, double Processing_time)
 	{
 		super(name);
     
@@ -26,7 +25,8 @@ public class proc extends ViewableAtomic
   
 	public void initialize()
 	{
-		job = new entity("");
+		job_in = new Job("");
+		job_out = new Job("");
 		
 		holdIn("passive", INFINITY);
 	}
@@ -40,7 +40,10 @@ public class proc extends ViewableAtomic
 			{
 				if (messageOnPort(x, "in", i))
 				{
-					job = (entity)x.getValOnPort("in", i);
+					job_in = (Job)x.getValOnPort("in", i);
+					
+					int sum = job_in.value[0] + job_in.value[1];
+					job_out = new Job(Integer.toString(sum));
 					
 					holdIn("busy", processing_time);
 				}
@@ -52,7 +55,7 @@ public class proc extends ViewableAtomic
 	{
 		if (phaseIs("busy"))
 		{
-			job = new entity("");
+			job_in = new Job("");
 			
 			holdIn("passive", INFINITY);
 		}
@@ -63,7 +66,7 @@ public class proc extends ViewableAtomic
 		message m = new message();
 		if (phaseIs("busy"))
 		{
-			m.add(makeContent("out", job));
+			m.add(makeContent("out", job_out));
 		}
 		return m;
 	}
@@ -72,8 +75,7 @@ public class proc extends ViewableAtomic
 	{
 		return
 		super.getTooltipText()
-		+ "\n" + "job: " + job.getName();
+		+ "\n" + "job_in: " + job_in.getName();
 	}
-
 }
 

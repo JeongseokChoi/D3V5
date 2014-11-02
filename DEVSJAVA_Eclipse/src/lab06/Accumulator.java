@@ -1,20 +1,19 @@
-package SimpArc;
+package lab06;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
 
-public class proc extends ViewableAtomic
+public class Accumulator extends ViewableAtomic
 {
-  
-	protected entity job;
+	protected Job job;
 	protected double processing_time;
 
-	public proc()
+	public Accumulator()
 	{
-		this("proc", 20);
+		this("acc", 20);
 	}
 
-	public proc(String name, double Processing_time)
+	public Accumulator(String name, double Processing_time)
 	{
 		super(name);
     
@@ -26,7 +25,7 @@ public class proc extends ViewableAtomic
   
 	public void initialize()
 	{
-		job = new entity("");
+		job = new Job("");
 		
 		holdIn("passive", INFINITY);
 	}
@@ -40,7 +39,13 @@ public class proc extends ViewableAtomic
 			{
 				if (messageOnPort(x, "in", i))
 				{
-					job = (entity)x.getValOnPort("in", i);
+					job = (Job)x.getValOnPort("in", i);
+					
+					int sum = 0;
+					for (int j = 0; j < job.value.length; j++)
+						sum += job.value[j];
+					
+					job = new Job(Integer.toString(sum));
 					
 					holdIn("busy", processing_time);
 				}
@@ -52,7 +57,7 @@ public class proc extends ViewableAtomic
 	{
 		if (phaseIs("busy"))
 		{
-			job = new entity("");
+			job = new Job("");
 			
 			holdIn("passive", INFINITY);
 		}

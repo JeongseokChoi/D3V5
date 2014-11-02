@@ -42,7 +42,7 @@ public class procQ extends ViewableAtomic
 			{
 				if (messageOnPort(x, "in", i))
 				{
-					job = x.getValOnPort("in", i);
+					job = (entity)x.getValOnPort("in", i);
 					
 					holdIn("busy", processing_time);
 				}
@@ -54,7 +54,7 @@ public class procQ extends ViewableAtomic
 			{
 				if (messageOnPort(x, "in", i))
 				{
-					entity temp = x.getValOnPort("in", i);
+					entity temp = (entity)x.getValOnPort("in", i);
 					q.add(temp);
 				}
 			}
