@@ -27,23 +27,23 @@ public class ROUNDROBIN extends ViewableDigraph
 		
 		for (int i = 0; i < USER_NUM; i++)
 		{
-			u[i] = new User("User_" + i, random.nextInt(), 10, 150);
+			u[i] = new User("User_" + i, random.nextInt(), 30, 1000);
 			add(u[i]);
 			addCoupling(u[i], "out", c, "in");
 		}
 		
-		v[0] = new VirtualMachine("VM_0", 0, random.nextInt(4) + 7,
-				random.nextInt(6) + 1, random.nextInt(6) + 1, 0);
-		v[1] = new VirtualMachine("VM_1", 1, random.nextInt(6) + 1,
-				random.nextInt(4) + 7, random.nextInt(6) + 1, 0);
-		v[2] = new VirtualMachine("VM_2", 2, random.nextInt(6) + 1,
-				random.nextInt(6) + 1, random.nextInt(4) + 7, 0);
-		v[3] = new VirtualMachine("VM_3", 3, random.nextInt(4) + 7,
-				random.nextInt(6) + 1, random.nextInt(6) + 1, 0);
-		v[4] = new VirtualMachine("VM_4", 4, random.nextInt(6) + 1,
-				random.nextInt(4) + 7, random.nextInt(6) + 1, 0);
-		v[5] = new VirtualMachine("VM_5", 5, random.nextInt(6) + 1,
-				random.nextInt(6) + 1, random.nextInt(4) + 7, 0);
+		v[0] = new VirtualMachine("VM_0", 0, random.nextInt(7) + 4,
+				random.nextInt(4) + 1, random.nextInt(4) + 1, 0);
+		v[1] = new VirtualMachine("VM_1", 1, random.nextInt(4) + 1,
+				random.nextInt(7) + 4, random.nextInt(4) + 1, 0);
+		v[2] = new VirtualMachine("VM_2", 2, random.nextInt(4) + 1,
+				random.nextInt(4) + 1, random.nextInt(7) + 4, 0);
+		v[3] = new VirtualMachine("VM_3", 3, random.nextInt(7) + 4,
+				random.nextInt(4) + 1, random.nextInt(4) + 1, 0);
+		v[4] = new VirtualMachine("VM_4", 4, random.nextInt(4) + 1,
+				random.nextInt(7) + 4, random.nextInt(4) + 1, 0);
+		v[5] = new VirtualMachine("VM_5", 5, random.nextInt(4) + 1,
+				random.nextInt(4) + 1, random.nextInt(7) + 4, 0);
 		for (int i = 0; i < VM_NUM; i++)
 		{
 			add(v[i]);

@@ -1,6 +1,8 @@
 package RAUDT;
 import java.awt.*;
+
 import simView.*;
+
 import java.util.Random;
 
 public class RAUDT extends ViewableDigraph
@@ -27,23 +29,23 @@ public class RAUDT extends ViewableDigraph
 		
 		for (int i = 0; i < USER_NUM; i++)
 		{
-			u[i] = new User("User_" + i, random.nextInt(), 10, 150);
+			u[i] = new User("User_" + i, random.nextInt(), 30, 1000);
 			add(u[i]);
 			addCoupling(u[i], "out", c, "in");
 		}
 		
-		v[0] = new VirtualMachine("VM_0", 0, random.nextInt(4) + 7,
-				random.nextInt(6) + 1, random.nextInt(6) + 1, 0);
-		v[1] = new VirtualMachine("VM_1", 1, random.nextInt(6) + 1,
-				random.nextInt(4) + 7, random.nextInt(6) + 1, 0);
-		v[2] = new VirtualMachine("VM_2", 2, random.nextInt(6) + 1,
-				random.nextInt(6) + 1, random.nextInt(4) + 7, 0);
-		v[3] = new VirtualMachine("VM_3", 3, random.nextInt(4) + 7,
-				random.nextInt(6) + 1, random.nextInt(6) + 1, 0);
-		v[4] = new VirtualMachine("VM_4", 4, random.nextInt(6) + 1,
-				random.nextInt(4) + 7, random.nextInt(6) + 1, 0);
-		v[5] = new VirtualMachine("VM_5", 5, random.nextInt(6) + 1,
-				random.nextInt(6) + 1, random.nextInt(4) + 7, 0);
+		v[0] = new VirtualMachine("VM_0", 0, random.nextInt(7) + 4,
+				random.nextInt(4) + 1, random.nextInt(4) + 1, 0);
+		v[1] = new VirtualMachine("VM_1", 1, random.nextInt(4) + 1,
+				random.nextInt(7) + 4, random.nextInt(4) + 1, 0);
+		v[2] = new VirtualMachine("VM_2", 2, random.nextInt(4) + 1,
+				random.nextInt(4) + 1, random.nextInt(7) + 4, 0);
+		v[3] = new VirtualMachine("VM_3", 3, random.nextInt(7) + 4,
+				random.nextInt(4) + 1, random.nextInt(4) + 1, 0);
+		v[4] = new VirtualMachine("VM_4", 4, random.nextInt(4) + 1,
+				random.nextInt(7) + 4, random.nextInt(4) + 1, 0);
+		v[5] = new VirtualMachine("VM_5", 5, random.nextInt(4) + 1,
+				random.nextInt(4) + 1, random.nextInt(7) + 4, 0);
 		for (int i = 0; i < VM_NUM; i++)
 		{
 			add(v[i]);
@@ -61,17 +63,17 @@ public class RAUDT extends ViewableDigraph
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1250, 748);
-        ((ViewableComponent)withName("JobAllcator")).setPreferredLocation(new Point(620, 232));
-        ((ViewableComponent)withName("VM_3")).setPreferredLocation(new Point(637, 580));
-        ((ViewableComponent)withName("User_0")).setPreferredLocation(new Point(24, 39));
+        preferredSize = new Dimension(1250, 753);
         ((ViewableComponent)withName("User_1")).setPreferredLocation(new Point(162, 38));
-        ((ViewableComponent)withName("JobClassifier")).setPreferredLocation(new Point(200, 256));
-        ((ViewableComponent)withName("VM_4")).setPreferredLocation(new Point(831, 581));
-        ((ViewableComponent)withName("VM_5")).setPreferredLocation(new Point(1026, 581));
-        ((ViewableComponent)withName("VM_2")).setPreferredLocation(new Point(445, 580));
-        ((ViewableComponent)withName("VM_0")).setPreferredLocation(new Point(60, 580));
         ((ViewableComponent)withName("VM_1")).setPreferredLocation(new Point(253, 581));
         ((ViewableComponent)withName("User_2")).setPreferredLocation(new Point(303, 38));
+        ((ViewableComponent)withName("VM_5")).setPreferredLocation(new Point(1026, 581));
+        ((ViewableComponent)withName("JobAllcator")).setPreferredLocation(new Point(620, 232));
+        ((ViewableComponent)withName("VM_2")).setPreferredLocation(new Point(445, 580));
+        ((ViewableComponent)withName("User_0")).setPreferredLocation(new Point(24, 39));
+        ((ViewableComponent)withName("VM_4")).setPreferredLocation(new Point(831, 581));
+        ((ViewableComponent)withName("VM_0")).setPreferredLocation(new Point(60, 580));
+        ((ViewableComponent)withName("VM_3")).setPreferredLocation(new Point(637, 580));
+        ((ViewableComponent)withName("JobClassifier")).setPreferredLocation(new Point(200, 256));
     }
 }
