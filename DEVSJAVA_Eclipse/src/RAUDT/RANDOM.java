@@ -3,23 +3,23 @@ import java.awt.*;
 import simView.*;
 import java.util.Random;
 
-public class RAUDT extends ViewableDigraph
+public class RANDOM extends ViewableDigraph
 {
 	final private static int USER_NUM = 3;
 	final private static int VM_NUM = 6;
 	
 	private Random random;
 	
-	public RAUDT()
+	public RANDOM()
 	{
-		super("Resource Allocation method for Unstructured Data Traits in Cloud Environment");
+		super("Random");
     	
 		random = new Random(920824);
 		
 		ViewableAtomic u[] = new User [USER_NUM];
 		ViewableAtomic v[] = new VirtualMachine [VM_NUM];
 		ViewableAtomic c = new JobClassifier("JobClassifier", 0);
-		ViewableAtomic a = new JobAllocator("JobAllcator", 6, 0);
+		ViewableAtomic a = new JobAllocatorRandom("JobAllcator", 6, 0);
 		
 		add(c);
 		add(a);
