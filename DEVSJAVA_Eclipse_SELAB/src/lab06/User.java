@@ -50,7 +50,22 @@ public class User extends ViewableAtomic
 		{
 			for (int i = 0; i < x.getLength(); i++)
 			{
-				holdIn("finished", INFINITY);
+				if (messageOnPort(x, "in", i))
+				{
+					job = new Job("5!", 5);
+					
+					holdIn("active", int_arr_time);
+				}
+			}
+		}
+		if (phaseIs("sent_3"))
+		{
+			for (int i = 0; i < x.getLength(); i++)
+			{
+				if (messageOnPort(x, "in", i))
+				{
+					holdIn("finished", INFINITY);
+				}
 			}
 		}
 	}
@@ -63,6 +78,8 @@ public class User extends ViewableAtomic
 				holdIn("sent_1", INFINITY);
 			if (job.jobFlag == 2)
 				holdIn("sent_2", INFINITY);
+			if (job.jobFlag == 3)
+				holdIn("sent_3", INFINITY);
 		}
 	}
 

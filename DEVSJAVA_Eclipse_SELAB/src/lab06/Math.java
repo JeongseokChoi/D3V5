@@ -20,14 +20,18 @@ public class Math extends ViewableDigraph
 		ViewableAtomic r = new Router("router", proc_t);
 		ViewableAtomic ad = new Add("add", proc_t);
 		ViewableAtomic ac = new Accumulator("acc", proc_t);
+		ViewableAtomic fa = new Factorial("factorial", proc_t);
 
 		add(r);
 		add(ad);
 		add(ac);
+		add(fa);
 		
 		addCoupling(this, "in", r, "in");
 		addCoupling(r, "out1", ad, "in");
 		addCoupling(r, "out2", ac, "in");
+		addCoupling(r, "out3", fa, "in");
+		addCoupling(fa, "out", this, "out");
 		addCoupling(ad, "out", this, "out");
 		addCoupling(ac, "out", this, "out");
 	}
@@ -39,9 +43,10 @@ public class Math extends ViewableDigraph
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(463, 297);
-        ((ViewableComponent)withName("acc")).setPreferredLocation(new Point(209, 183));
-        ((ViewableComponent)withName("add")).setPreferredLocation(new Point(209, 63));
-        ((ViewableComponent)withName("router")).setPreferredLocation(new Point(24, 123));
+        preferredSize = new Dimension(463, 395);
+        ((ViewableComponent)withName("acc")).setPreferredLocation(new Point(209, 172));
+        ((ViewableComponent)withName("factorial")).setPreferredLocation(new Point(209, 277));
+        ((ViewableComponent)withName("add")).setPreferredLocation(new Point(209, 66));
+        ((ViewableComponent)withName("router")).setPreferredLocation(new Point(19, 172));
     }
 }

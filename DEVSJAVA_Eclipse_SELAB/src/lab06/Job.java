@@ -5,6 +5,7 @@ public class Job extends entity
 {   
 	int jobFlag;
 	int[] value;
+	int number;
 	
 	public Job(String name)
 	{
@@ -12,6 +13,7 @@ public class Job extends entity
 		
 		jobFlag = -1;
 		value = null;
+		number = -1;
 	}
 	
 	public Job(String name, int a, int b)
@@ -23,6 +25,8 @@ public class Job extends entity
 		value = new int [2];
 		value[0] = a;
 		value[1] = b;
+		
+		number = -1;
 	}
 	
 	public Job(String name,
@@ -44,5 +48,17 @@ public class Job extends entity
 		value[7] = h;
 		value[8] = i;
 		value[9] = j;
+		
+		number = -1;
+	}
+	
+	public Job(String name, int n)
+	{
+		super(name);
+		
+		jobFlag = 3;
+		
+		value = null;
+		number = n;
 	}
 }

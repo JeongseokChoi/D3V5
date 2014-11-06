@@ -3,24 +3,23 @@ import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
 
-public class Router extends ViewableAtomic
+public class Factorial extends ViewableAtomic
 {
+  
 	protected Job job;
 	protected double processing_time;
 
-	public Router()
+	public Factorial()
 	{
-		this("router", 20);
+		this("Factorial", 20);
 	}
 
-	public Router(String name, double Processing_time)
+	public Factorial(String name, double Processing_time)
 	{
 		super(name);
     
 		addInport("in");
-		addOutport("out1");
-		addOutport("out2");
-		addOutport("out3");
+		addOutport("out");
 		
 		processing_time = Processing_time;
 	}
@@ -42,8 +41,12 @@ public class Router extends ViewableAtomic
 				if (messageOnPort(x, "in", i))
 				{
 					job = (Job)x.getValOnPort("in", i);
+					int factorial = 1;
+					for (int j = 1; j <= job.number; j++)
+						factorial *= j;
+					job = new Job(Integer.toString(factorial));
 					
-					holdIn("sending", processing_time);
+					holdIn("busy", processing_time);
 				}
 			}
 		}
@@ -51,7 +54,7 @@ public class Router extends ViewableAtomic
   
 	public void deltint()
 	{
-		if (phaseIs("sending"))
+		if (phaseIs("busy"))
 		{
 			job = new Job("");
 			
@@ -62,14 +65,9 @@ public class Router extends ViewableAtomic
 	public message out()
 	{
 		message m = new message();
-		if (phaseIs("sending"))
+		if (phaseIs("busy"))
 		{
-			if (job.jobFlag == 1)
-				m.add(makeContent("out1", job));
-			else if (job.jobFlag == 2)
-				m.add(makeContent("out2", job));
-			else if (job.jobFlag == 3)
-				m.add(makeContent("out3", job));
+			m.add(makeContent("out", job));
 		}
 		return m;
 	}
@@ -80,4 +78,6 @@ public class Router extends ViewableAtomic
 		super.getTooltipText()
 		+ "\n" + "job: " + job.getName();
 	}
+
 }
+
