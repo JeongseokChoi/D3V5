@@ -26,7 +26,7 @@ public class genr extends ViewableAtomic
   
 	public void initialize()
 	{
-		count = 1;
+		count = 0;
 		
 		holdIn("active", int_arr_time);
 	}

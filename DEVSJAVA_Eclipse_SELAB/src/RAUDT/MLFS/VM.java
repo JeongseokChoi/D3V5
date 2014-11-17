@@ -3,38 +3,28 @@ import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
 
-public class VirtualMachine extends ViewableAtomic
+public class VM extends ViewableAtomic
 {
-	final protected int id;
-	final protected double CPU;
-	final protected double RAM;
-	final protected double NetResponse;
-	
 	protected Queue q;
+	protected Info info;
 	protected Job job;
 	protected double processing_time;
 	
-	public VirtualMachine()
+	public VM()
 	{
-		this("VM", 0, 1.0, 1.0, 1.0, 20);
+		this("VM", 10, new Info("dummy"));
 	}
 
-	public VirtualMachine(String name,
-			int _id, double c, double r, double n,
-			double Processing_time)
+	public VM(String name, double Processing_time, Info _info)
 	{
 		super(name);
-    
-		addInport("in");
-		addOutport("out");
-		addOutport("req_out");
-		addOutport("info_out");
-	
-		id = _id;
-		CPU = c;
-		RAM = r;
-		NetResponse = n;
 		
+		addInport("in");
+		addOutport("done");
+		addOutport("vm_info");
+		addOutport("out");
+		
+		info = _info;
 		processing_time = Processing_time;
 	}
 	
@@ -43,7 +33,7 @@ public class VirtualMachine extends ViewableAtomic
 		q = new Queue();
 		job = new Job("");
 		
-		holdIn("initiating", 0);
+		holdIn("init", 0);
 	}
 
 	public void deltext(double e, message x)
@@ -58,18 +48,10 @@ public class VirtualMachine extends ViewableAtomic
 					job = (Job)x.getValOnPort("in", i);
 					switch (job.type)
 					{
-					case 'V':
-						processing_time = (double)(int)(job.size / CPU);
-						break;
-					case 'I':
-						processing_time = (double)(int)(job.size / RAM);
-						break;
-					case 'A':
-						processing_time = (double)(int)(job.size / NetResponse);
-						break;
-					default:
-						processing_time = 0.0;
-						break;
+					case 'V': processing_time = (int)job.size / info.CPU; break;
+					case 'I': processing_time = (int)job.size / info.RAM; break;
+					case 'A': processing_time = (int)job.size / info.NetResponse; break;
+					default: System.out.println("Exception!"); break;
 					}
 					
 					holdIn("busy", processing_time);
@@ -98,18 +80,10 @@ public class VirtualMachine extends ViewableAtomic
 				job = (Job) q.removeFirst();
 				switch (job.type)
 				{
-				case 'V':
-					processing_time = (double)(int)(job.size / CPU);
-					break;
-				case 'I':
-					processing_time = (double)(int)(job.size / RAM);
-					break;
-				case 'A':
-					processing_time = (double)(int)(job.size / NetResponse);
-					break;
-				default:
-					processing_time = 0.0;
-					break;
+				case 'V': processing_time = (int)job.size / info.CPU; break;
+				case 'I': processing_time = (int)job.size / info.RAM; break;
+				case 'A': processing_time = (int)job.size / info.NetResponse; break;
+				default: System.out.println("Exception!"); break;
 				}
 				
 				holdIn("busy", processing_time);
@@ -121,9 +95,9 @@ public class VirtualMachine extends ViewableAtomic
 				holdIn("passive", INFINITY);
 			}
 		}
-		else if (phaseIs("initiating"))
+		else if (phaseIs("init"))
 		{
-			holdIn("passive", INFINITY);
+			passivate();
 		}
 	}
 
@@ -131,22 +105,25 @@ public class VirtualMachine extends ViewableAtomic
 	{
 		message m = new message();
 		
-		if (phaseIs("initiating"))
+		if (phaseIs("init"))
 		{
-			m.add(makeContent("info_out", new Info("VM info", id, CPU, RAM, NetResponse)));
+			m.add(makeContent("vm_info", info));
 		}
 		else if (phaseIs("busy"))
 		{
 			m.add(makeContent("out", job));
-			m.add(makeContent("req_out", new Info("finished", id, 0, 0, 0)));
+			m.add(makeContent("done", info));
 		}
 		return m;
-	}	
-	
+	}
+
 	public String getTooltipText()
 	{
 		return
         super.getTooltipText()
+        + "\n" + "CPU: " + info.CPU
+        + "\n" + "RAM: " + info.RAM
+        + "\n" + "NetResponse: " + info.NetResponse
         + "\n" + "queue length: " + q.size()
         + "\n" + "queue itself: " + q.toString();
 	}

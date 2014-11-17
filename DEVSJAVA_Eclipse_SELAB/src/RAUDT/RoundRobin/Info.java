@@ -1,4 +1,4 @@
-package RAUDT.MLFS;
+package RAUDT.RoundRobin;
 import GenCol.*;
 
 public class Info extends entity

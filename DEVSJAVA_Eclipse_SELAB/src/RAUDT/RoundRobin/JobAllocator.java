@@ -1,4 +1,4 @@
-package RAUDT.MLFS;
+package RAUDT.RoundRobin;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
@@ -14,6 +14,7 @@ public class JobAllocator extends ViewableAtomic
 	protected Queue Queue_CPU, Queue_RAM, Queue_NetResponse;
 	protected Job job;
 	protected Info info;
+	protected int current_V, current_I, current_A;
 	protected double processing_time;
 
 	public JobAllocator()
@@ -34,7 +35,7 @@ public class JobAllocator extends ViewableAtomic
 		vm_count = _vm_count;
 		processing_time = Processing_time;
 	}
-
+  
 	public void initialize()
 	{
 		Queue_CPU = new Queue();
@@ -50,6 +51,9 @@ public class JobAllocator extends ViewableAtomic
 			vm_queue_length[i] = 0;
 		}
 		job = new Job("");
+		current_V = 0;
+		current_I = 1;
+		current_A = 2;
 		
 		holdIn("passive", INFINITY);
 	}
@@ -64,37 +68,8 @@ public class JobAllocator extends ViewableAtomic
 				if (messageOnPort(x, "in", i))
 				{
 					job = (Job)x.getValOnPort("in", i);
-					switch (job.type)
-					{
-					case 'V': Queue_CPU.add(job); break;
-					case 'I': Queue_RAM.add(job); break;
-					case 'A': Queue_NetResponse.add(job); break;
-					default: System.out.println("Exception!"); break;
-					}
 					
 					holdIn("busy", processing_time);
-				}
-				else if (messageOnPort(x, "done", i))
-				{
-					info = (Info)x.getValOnPort("done", i);
-					vm_available[info.vm_id] = true;
-					
-					holdIn("busy", processing_time);
-				}
-				else if (messageOnPort(x, "vm_info", i))
-				{
-					info = (Info)x.getValOnPort("vm_info", i);
-					int CPU = info.CPU;
-					int RAM = info.RAM;
-					int NetResponse = info.NetResponse;
-					if (CPU >= RAM && CPU >= NetResponse)
-						vm_type[info.vm_id] = 'V';
-					if (RAM >= NetResponse && RAM >= CPU)
-						vm_type[info.vm_id] = 'I';
-					if (NetResponse >= CPU && NetResponse >= RAM)
-						vm_type[info.vm_id] = 'A';
-					
-					holdIn("passive", INFINITY);
 				}
 			}
 		}
@@ -113,26 +88,22 @@ public class JobAllocator extends ViewableAtomic
 		message m = new message();
 		if (phaseIs("busy"))
 		{
-			for (int i = 0; i < vm_count; i++)
+			switch (job.type)
 			{
-				if (vm_available[i] == true)
-				{
-					if (vm_type[i] == 'V' && Queue_CPU.size() > 0)
-					{
-						m.add(makeContent("out" + i, (Job)Queue_CPU.removeFirst()));
-						vm_available[i] = false;
-					}
-					else if (vm_type[i] == 'I' && Queue_RAM.size() > 0)
-					{
-						m.add(makeContent("out" + i, (Job)Queue_RAM.removeFirst()));
-						vm_available[i] = false;
-					}
-					else if (vm_type[i] == 'A' && Queue_NetResponse.size() > 0)
-					{
-						m.add(makeContent("out" + i, (Job)Queue_NetResponse.removeFirst()));
-						vm_available[i] = false;
-					}
-				}
+			case 'V':
+				m.add(makeContent("out" + current_V, job));
+				current_V = (current_V == 0)? 3 : 0;
+				break;
+			case 'I':
+				m.add(makeContent("out" + current_I, job));
+				current_I = (current_I == 1)? 4 : 1;
+				break;
+			case 'A':
+				m.add(makeContent("out" + current_A, job));
+				current_A = (current_A == 2)? 5 : 2;
+				break;
+			default:
+				break;
 			}
 		}
 		return m;
@@ -147,5 +118,6 @@ public class JobAllocator extends ViewableAtomic
 		+ "\n" + "Queue_RAM: " + Queue_RAM.toString()
 		+ "\n" + "Queue_NetResponse: " + Queue_NetResponse.toString();
 	}
+
 }
 

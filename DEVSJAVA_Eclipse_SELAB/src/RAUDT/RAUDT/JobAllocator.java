@@ -1,4 +1,4 @@
-package RAUDT.MLFS;
+package RAUDT.RAUDT;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
@@ -34,7 +34,7 @@ public class JobAllocator extends ViewableAtomic
 		vm_count = _vm_count;
 		processing_time = Processing_time;
 	}
-
+  
 	public void initialize()
 	{
 		Queue_CPU = new Queue();
@@ -147,5 +147,6 @@ public class JobAllocator extends ViewableAtomic
 		+ "\n" + "Queue_RAM: " + Queue_RAM.toString()
 		+ "\n" + "Queue_NetResponse: " + Queue_NetResponse.toString();
 	}
+
 }
 
