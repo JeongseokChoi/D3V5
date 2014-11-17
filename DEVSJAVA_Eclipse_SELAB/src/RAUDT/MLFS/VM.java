@@ -8,6 +8,7 @@ public class VM extends ViewableAtomic
 	protected Queue q;
 	protected Info info;
 	protected Job job;
+	protected double tmp_sigma;
 	protected double processing_time;
 	
 	public VM()
@@ -32,10 +33,11 @@ public class VM extends ViewableAtomic
 	{
 		q = new Queue();
 		job = new Job("");
+		tmp_sigma = INFINITY;
 		
 		holdIn("init", 0);
 	}
-
+	
 	public void deltext(double e, message x)
 	{
 		Continue(e);
@@ -66,6 +68,9 @@ public class VM extends ViewableAtomic
 				{
 					Job temp = (Job)x.getValOnPort("in", i);
 					q.add(temp);
+					tmp_sigma = sigma;
+					
+					holdIn("sending Q len", 0);
 				}
 			}
 		}
@@ -86,7 +91,8 @@ public class VM extends ViewableAtomic
 				default: System.out.println("Exception!"); break;
 				}
 				
-				holdIn("busy", processing_time);
+				tmp_sigma = processing_time;
+				holdIn("sending Q len", 0);
 			}
 			else
 			{
@@ -94,6 +100,12 @@ public class VM extends ViewableAtomic
 				
 				holdIn("passive", INFINITY);
 			}
+		}
+		else if (phaseIs("sending Q len"))
+		{
+			phase = "busy";
+			sigma = tmp_sigma;
+			tmp_sigma = INFINITY;
 		}
 		else if (phaseIs("init"))
 		{
@@ -113,6 +125,10 @@ public class VM extends ViewableAtomic
 		{
 			m.add(makeContent("out", job));
 			m.add(makeContent("done", info));
+		}
+		else if (phaseIs("sending Q len"))
+		{
+			m.add(makeContent("vm_info", new Info(q.size())));
 		}
 		return m;
 	}

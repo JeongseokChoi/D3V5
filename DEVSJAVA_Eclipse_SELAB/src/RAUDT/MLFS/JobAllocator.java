@@ -24,9 +24,10 @@ public class JobAllocator extends ViewableAtomic
 	public JobAllocator(String name, double Processing_time, int _vm_count)
 	{
 		super(name);
-    
+
 		addInport("in");
 		addInport("vm_info");
+		addInport("q_length");
 		addInport("done");
 		for (int i = 0; i < _vm_count; i++)
 			addOutport("out" + i);
@@ -96,6 +97,15 @@ public class JobAllocator extends ViewableAtomic
 					
 					holdIn("passive", INFINITY);
 				}
+				else if (messageOnPort(x, "q_length", i))
+				{
+					info = (Info)x.getValOnPort("q_length", i);
+					vm_queue_length[info.vm_id] = info.queue_length;
+					
+					// DEBUG
+					for (int j = 0; j < vm_count; j++)
+						System.out.println("VM #" + info.vm_id + " queue length: " + vm_queue_length[info.vm_id]);
+				}
 			}
 		}
 	}
@@ -113,24 +123,33 @@ public class JobAllocator extends ViewableAtomic
 		message m = new message();
 		if (phaseIs("busy"))
 		{
+			int max_q_idx = 0, min_q_idx = 0;
 			for (int i = 0; i < vm_count; i++)
 			{
-				if (vm_available[i] == true)
+				if (vm_queue_length[i] > vm_queue_length[max_q_idx])
+					max_q_idx = i;
+				if (vm_queue_length[i] < vm_queue_length[min_q_idx])
+					min_q_idx = i;
+			}
+			if ((vm_queue_length[max_q_idx] - vm_queue_length[min_q_idx]) > 2)
+			{
+				// Job Allocator를 완전히 뜯어 고칠 것임
+			}
+			else
+			{
+				for (int i = 0; i < vm_count; i++)
 				{
 					if (vm_type[i] == 'V' && Queue_CPU.size() > 0)
 					{
 						m.add(makeContent("out" + i, (Job)Queue_CPU.removeFirst()));
-						vm_available[i] = false;
 					}
 					else if (vm_type[i] == 'I' && Queue_RAM.size() > 0)
 					{
 						m.add(makeContent("out" + i, (Job)Queue_RAM.removeFirst()));
-						vm_available[i] = false;
 					}
 					else if (vm_type[i] == 'A' && Queue_NetResponse.size() > 0)
 					{
 						m.add(makeContent("out" + i, (Job)Queue_NetResponse.removeFirst()));
-						vm_available[i] = false;
 					}
 				}
 			}
