@@ -1,25 +1,27 @@
-package RAUDT;
+package RAUDT.ERROR;
 import java.awt.*;
+
 import simView.*;
+
 import java.util.Random;
 
-public class ROUNDROBIN extends ViewableDigraph
+public class RAUDT extends ViewableDigraph
 {
 	final private static int USER_NUM = 3;
 	final private static int VM_NUM = 6;
 	
 	private Random random;
 	
-	public ROUNDROBIN()
+	public RAUDT()
 	{
-		super("Round Robin");
+		super("Resource Allocation method for Unstructured Data Traits in Cloud Environment");
     	
 		random = new Random(920824);
 		
 		ViewableAtomic u[] = new User [USER_NUM];
 		ViewableAtomic v[] = new VirtualMachine [VM_NUM];
 		ViewableAtomic c = new JobClassifier("JobClassifier", 0);
-		ViewableAtomic a = new JobAllocatorRoundRobin("JobAllcator", 6, 0);
+		ViewableAtomic a = new JobAllocator("JobAllcator", 6, 0);
 		
 		add(c);
 		add(a);
@@ -61,17 +63,17 @@ public class ROUNDROBIN extends ViewableDigraph
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1250, 748);
-        ((ViewableComponent)withName("JobAllcator")).setPreferredLocation(new Point(620, 232));
-        ((ViewableComponent)withName("VM_3")).setPreferredLocation(new Point(637, 580));
-        ((ViewableComponent)withName("User_0")).setPreferredLocation(new Point(24, 39));
+        preferredSize = new Dimension(1250, 753);
         ((ViewableComponent)withName("User_1")).setPreferredLocation(new Point(162, 38));
-        ((ViewableComponent)withName("JobClassifier")).setPreferredLocation(new Point(200, 256));
-        ((ViewableComponent)withName("VM_4")).setPreferredLocation(new Point(831, 581));
-        ((ViewableComponent)withName("VM_5")).setPreferredLocation(new Point(1026, 581));
-        ((ViewableComponent)withName("VM_2")).setPreferredLocation(new Point(445, 580));
-        ((ViewableComponent)withName("VM_0")).setPreferredLocation(new Point(60, 580));
         ((ViewableComponent)withName("VM_1")).setPreferredLocation(new Point(253, 581));
         ((ViewableComponent)withName("User_2")).setPreferredLocation(new Point(303, 38));
+        ((ViewableComponent)withName("VM_5")).setPreferredLocation(new Point(1026, 581));
+        ((ViewableComponent)withName("JobAllcator")).setPreferredLocation(new Point(620, 232));
+        ((ViewableComponent)withName("VM_2")).setPreferredLocation(new Point(445, 580));
+        ((ViewableComponent)withName("User_0")).setPreferredLocation(new Point(24, 39));
+        ((ViewableComponent)withName("VM_4")).setPreferredLocation(new Point(831, 581));
+        ((ViewableComponent)withName("VM_0")).setPreferredLocation(new Point(60, 580));
+        ((ViewableComponent)withName("VM_3")).setPreferredLocation(new Point(637, 580));
+        ((ViewableComponent)withName("JobClassifier")).setPreferredLocation(new Point(200, 256));
     }
 }

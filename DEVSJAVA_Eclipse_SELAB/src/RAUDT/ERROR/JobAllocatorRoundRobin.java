@@ -1,4 +1,4 @@
-package RAUDT;
+package RAUDT.ERROR;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;

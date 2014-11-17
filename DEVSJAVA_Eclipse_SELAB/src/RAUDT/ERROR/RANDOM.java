@@ -1,4 +1,4 @@
-package RAUDT;
+package RAUDT.ERROR;
 import java.awt.*;
 
 import simView.*;

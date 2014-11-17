@@ -1,9 +1,9 @@
-package RAUDT;
+package RAUDT.MLFS;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
 
-public class JobAllocatorRandom extends ViewableAtomic
+public class JobAllocator extends ViewableAtomic
 {
 	protected int vmNum;
 	protected boolean[] vmAvailable;
@@ -14,12 +14,12 @@ public class JobAllocatorRandom extends ViewableAtomic
 	protected Info info;
 	protected double processing_time;
 
-	public JobAllocatorRandom()
+	public JobAllocator()
 	{
 		this("JobAllocator", 1, 20);
 	}
 
-	public JobAllocatorRandom(String name, int _vmNum, double Processing_time)
+	public JobAllocator(String name, int _vmNum, double Processing_time)
 	{
 		super(name);
     
@@ -66,6 +66,14 @@ public class JobAllocatorRandom extends ViewableAtomic
 				{
 					job = (Job)x.getValOnPort("job_in", i);
 					
+					switch(job.type)
+					{
+					case 'V': Queue_CPU.add(job); break;
+					case 'I': Queue_RAM.add(job); break;
+					case 'A': Queue_NetResponse.add(job); break;
+					default: break;
+					}
+					
 					holdIn("busy", processing_time);
 				}
 				else if (messageOnPort(x, "info_in", i))
@@ -82,6 +90,12 @@ public class JobAllocatorRandom extends ViewableAtomic
 						System.out.println("! Exception !");
 					
 					holdIn("passive", INFINITY);
+				}
+				else if (messageOnPort(x, "req_in", i))
+				{
+					info = (Info)x.getValOnPort("req_in", i);
+					vmAvailable[info.id] = true;
+					holdIn("busy", processing_time);
 				}
 			}
 		}
@@ -102,8 +116,42 @@ public class JobAllocatorRandom extends ViewableAtomic
 		message m = new message();
 		if (phaseIs("busy"))
 		{
-			int port = (int)(Math.random() * vmNum);
-			m.add(makeContent("out" + port, job));
+			if (Queue_CPU.isEmpty() == false)
+			{
+				for (int i = 0; i < vmNum; i++)
+				{
+					if (vmType[i] == 'V' && vmAvailable[i] == true)
+					{
+						m.add(makeContent("out" + i, (Job)Queue_CPU.removeFirst()));
+						vmAvailable[i] = false;
+						break;
+					}
+				}
+			}
+			if (Queue_RAM.isEmpty() == false)
+			{
+				for (int i = 0; i < vmNum; i++)
+				{
+					if (vmType[i] == 'I' && vmAvailable[i] == true)
+					{
+						m.add(makeContent("out" + i, (Job)Queue_RAM.removeFirst()));
+						vmAvailable[i] = false;
+						break;
+					}
+				}
+			}
+			if (Queue_NetResponse.isEmpty() == false)
+			{
+				for (int i = 0; i < vmNum; i++)
+				{
+					if (vmType[i] == 'A' && vmAvailable[i] == true)
+					{
+						m.add(makeContent("out" + i, (Job)Queue_NetResponse.removeFirst()));
+						vmAvailable[i] = false;
+						break;
+					}
+				}
+			}
 		}
 		return m;
 	}

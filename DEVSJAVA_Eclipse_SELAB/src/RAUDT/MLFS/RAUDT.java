@@ -1,4 +1,4 @@
-package RAUDT;
+package RAUDT.MLFS;
 import java.awt.*;
 
 import simView.*;

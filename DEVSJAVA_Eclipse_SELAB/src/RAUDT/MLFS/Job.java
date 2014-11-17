@@ -1,4 +1,4 @@
-package RAUDT;
+package RAUDT.MLFS;
 import GenCol.*;
 
 public class Job extends entity
