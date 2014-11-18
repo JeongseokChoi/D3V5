@@ -8,7 +8,7 @@ public class Constants
 	final public static int USER_NUM = 5;
 	final public static int USER_INT_ARR_TIME = 10;
 	final public static int VM_NUM = 6;
-	final public static int JOB_COUNT = 400;
+	final public static int JOB_COUNT = 200;
 	final public static int[] USER_SEED =
 			new int [] {920721, 930214, 920824, 960121, 940308};
 	final public static int CLASSIFIER_SEED = 920828;
