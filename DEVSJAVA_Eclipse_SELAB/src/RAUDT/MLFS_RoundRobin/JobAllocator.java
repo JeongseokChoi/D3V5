@@ -1,4 +1,6 @@
-package RAUDT.MLFS;
+package RAUDT.MLFS_RoundRobin;
+import java.beans.DesignMode;
+
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
@@ -8,12 +10,14 @@ public class JobAllocator extends ViewableAtomic
 {
 	protected int vm_count;
 	protected char[] vm_type;
-	protected boolean[] vm_available;
+	protected int[] vm_sent;
 	protected int[] vm_queue_length;
-	
+
+	protected Queue q;
 	protected Queue Queue_CPU, Queue_RAM, Queue_NetResponse;
 	protected Job job;
 	protected Info info;
+	protected int current;
 	protected double processing_time;
 
 	public JobAllocator()
@@ -38,18 +42,21 @@ public class JobAllocator extends ViewableAtomic
 
 	public void initialize()
 	{
+		q = new Queue();
+		
 		Queue_CPU = new Queue();
 		Queue_RAM = new Queue();
 		Queue_NetResponse = new Queue();
 		vm_type = new char [vm_count];
-		vm_available = new boolean [vm_count];
+		vm_sent = new int [vm_count];
 		vm_queue_length = new int [vm_count];
 		for (int i = 0; i < vm_count; i++)
 		{
 			vm_type[i] = ' ';
-			vm_available[i] = true;
+			vm_sent[i] = 0;
 			vm_queue_length[i] = 0;
 		}
+		current = 0;
 		job = new Job("");
 		
 		holdIn("passive", INFINITY);
@@ -58,6 +65,7 @@ public class JobAllocator extends ViewableAtomic
 	public void deltext(double e, message x)
 	{
 		Continue(e);
+
 		if (phaseIs("passive"))
 		{
 			for (int i = 0; i < x.getLength(); i++)
@@ -65,6 +73,7 @@ public class JobAllocator extends ViewableAtomic
 				if (messageOnPort(x, "in", i))
 				{
 					job = (Job)x.getValOnPort("in", i);
+					/*
 					switch (job.type)
 					{
 					case 'V': Queue_CPU.add(job); break;
@@ -72,13 +81,7 @@ public class JobAllocator extends ViewableAtomic
 					case 'A': Queue_NetResponse.add(job); break;
 					default: System.out.println("Exception!"); break;
 					}
-					
-					holdIn("busy", processing_time);
-				}
-				else if (messageOnPort(x, "done", i))
-				{
-					info = (Info)x.getValOnPort("done", i);
-					vm_available[info.vm_id] = true;
+					*/
 					
 					holdIn("busy", processing_time);
 				}
@@ -104,7 +107,37 @@ public class JobAllocator extends ViewableAtomic
 					
 					// DEBUG
 					for (int j = 0; j < vm_count; j++)
-						System.out.println("VM #" + info.vm_id + " queue length: " + vm_queue_length[info.vm_id]);
+						System.out.println("VM #" + j + " queue length: " + vm_queue_length[j]);
+					System.out.println("");
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < x.getLength(); i++)
+			{
+				if (messageOnPort(x, "in", i))
+				{
+					q.add(x.getValOnPort("in", i));
+					/*
+					switch (job.type)
+					{
+					case 'V': Queue_CPU.add(job); break;
+					case 'I': Queue_RAM.add(job); break;
+					case 'A': Queue_NetResponse.add(job); break;
+					default: System.out.println("Exception!"); break;
+					}
+					*/
+				}
+				else if (messageOnPort(x, "q_length", i))
+				{
+					info = (Info)x.getValOnPort("q_length", i);
+					vm_queue_length[info.vm_id] = info.queue_length;
+					
+					// DEBUG
+					for (int j = 0; j < vm_count; j++)
+						System.out.println("VM #" + j + " queue length: " + vm_queue_length[j]);
+					System.out.println("");
 				}
 			}
 		}
@@ -114,7 +147,16 @@ public class JobAllocator extends ViewableAtomic
 	{
 		if (phaseIs("busy"))
 		{
-			holdIn("passive", INFINITY);
+			if (q.size() > 0)
+			{
+				job = (Job)q.removeFirst();
+				
+				holdIn("busy", processing_time);
+			}
+			else
+			{
+				holdIn("passive", INFINITY);
+			}
 		}
 	}
 
@@ -133,26 +175,67 @@ public class JobAllocator extends ViewableAtomic
 			}
 			if ((vm_queue_length[max_q_idx] - vm_queue_length[min_q_idx]) > 2)
 			{
-				// Job Allocator¸¦ ¿ÏÀüÈ÷ ¶â¾î °íÄ¥ °ÍÀÓ
+				m.add(makeContent("out" + min_q_idx, job));
 			}
 			else
 			{
-				for (int i = 0; i < vm_count; i++)
+				m.add(makeContent("out" + current, job));
+				current = (current + 1) % vm_count;
+			}
+			
+			/*
+			int max_q_idx = 0, min_q_idx = 0;
+			for (int i = 0; i < vm_count; i++)
+			{
+				if (vm_queue_length[i] > vm_queue_length[max_q_idx])
+					max_q_idx = i;
+				if (vm_queue_length[i] < vm_queue_length[min_q_idx])
+					min_q_idx = i;
+			}
+			if ((vm_queue_length[max_q_idx] - vm_queue_length[min_q_idx]) > 2)
+			{
+				m.add(makeContent("out" + min_q_idx, job));
+			}
+			else
+			{
+				int destination;
+				switch (job.type)
 				{
-					if (vm_type[i] == 'V' && Queue_CPU.size() > 0)
-					{
-						m.add(makeContent("out" + i, (Job)Queue_CPU.removeFirst()));
-					}
-					else if (vm_type[i] == 'I' && Queue_RAM.size() > 0)
-					{
-						m.add(makeContent("out" + i, (Job)Queue_RAM.removeFirst()));
-					}
-					else if (vm_type[i] == 'A' && Queue_NetResponse.size() > 0)
-					{
-						m.add(makeContent("out" + i, (Job)Queue_NetResponse.removeFirst()));
-					}
+				case 'V':
+					if (vm_queue_length[0] < vm_queue_length[3])
+						destination = 0;
+					else if (vm_queue_length[0] > vm_queue_length[3])
+						destination = 3;
+					else
+						destination = (vm_sent[0] < vm_sent[3])? 0 : 3;
+					m.add(makeContent("out" + destination, job));
+					vm_sent[destination] += 1;
+					break;
+				case 'I':
+					if (vm_queue_length[1] < vm_queue_length[4])
+						destination = 1;
+					else if (vm_queue_length[1] > vm_queue_length[4])
+						destination = 4;
+					else
+						destination = (vm_sent[1] < vm_sent[4])? 1 : 4;
+					m.add(makeContent("out" + destination, job));
+					vm_sent[destination] += 1;
+					break;
+				case 'A':
+					if (vm_queue_length[2] < vm_queue_length[5])
+						destination = 2;
+					else if (vm_queue_length[2] > vm_queue_length[5])
+						destination = 5;
+					else
+						destination = (vm_sent[2] < vm_sent[5])? 2 : 5;
+					m.add(makeContent("out" + destination, job));
+					vm_sent[destination] += 1;
+					break;
+				default:
+					break;
 				}
 			}
+			*/
 		}
 		return m;
 	}
@@ -162,6 +245,7 @@ public class JobAllocator extends ViewableAtomic
 		return
 		super.getTooltipText()
 		+ "\n" + "job: " + job.getName()
+		+ "\n" + "queue: " + q.toString()
 		+ "\n" + "Queue_CPU: " + Queue_CPU.toString()
 		+ "\n" + "Queue_RAM: " + Queue_RAM.toString()
 		+ "\n" + "Queue_NetResponse: " + Queue_NetResponse.toString();

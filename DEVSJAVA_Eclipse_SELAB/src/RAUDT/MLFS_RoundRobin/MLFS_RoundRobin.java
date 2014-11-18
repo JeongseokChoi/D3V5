@@ -1,12 +1,12 @@
-package RAUDT.RAUDT;
+package RAUDT.MLFS_RoundRobin;
 import java.awt.*;
 import simView.*;
 
-public class RAUDT extends ViewableDigraph
+public class MLFS_RoundRobin extends ViewableDigraph
 {	
-	public RAUDT()
+	public MLFS_RoundRobin()
 	{
-		super("RAUDT");
+		super("MLFS_RoundRobin");
 		
 		ViewableAtomic[] user = new User [Constants.USER_NUM];
 		ViewableAtomic[] vm = new VM [Constants.VM_NUM];
@@ -32,6 +32,7 @@ public class RAUDT extends ViewableDigraph
 			addCoupling(vm[i], "out", jc, "done");
 			addCoupling(vm[i], "done", ja, "done");
 			addCoupling(vm[i], "vm_info", ja, "vm_info");
+			addCoupling(vm[i], "q_length", ja, "q_length");
 		}
 	}
 
@@ -43,16 +44,18 @@ public class RAUDT extends ViewableDigraph
     public void layoutForSimView()
     {
         preferredSize = new Dimension(1201, 733);
-        ((ViewableComponent)withName("User #2")).setPreferredLocation(new Point(361, 67));
+        ((ViewableComponent)withName("User #1")).setPreferredLocation(new Point(206, 68));
+        ((ViewableComponent)withName("Job Allocator")).setPreferredLocation(new Point(697, 265));
+        ((ViewableComponent)withName("VM #5")).setPreferredLocation(new Point(985, 627));
         ((ViewableComponent)withName("VM #0")).setPreferredLocation(new Point(10, 620));
         ((ViewableComponent)withName("User #0")).setPreferredLocation(new Point(50, 69));
-        ((ViewableComponent)withName("User #1")).setPreferredLocation(new Point(206, 68));
+        ((ViewableComponent)withName("User #4")).setPreferredLocation(new Point(680, 66));
+        ((ViewableComponent)withName("VM #1")).setPreferredLocation(new Point(198, 623));
+        ((ViewableComponent)withName("User #3")).setPreferredLocation(new Point(526, 66));
+        ((ViewableComponent)withName("VM #4")).setPreferredLocation(new Point(791, 627));
         ((ViewableComponent)withName("VM #3")).setPreferredLocation(new Point(592, 627));
-        ((ViewableComponent)withName("VM #5")).setPreferredLocation(new Point(985, 627));
-        ((ViewableComponent)withName("Job Allocator")).setPreferredLocation(new Point(699, 252));
         ((ViewableComponent)withName("Job Classifier")).setPreferredLocation(new Point(218, 276));
         ((ViewableComponent)withName("VM #2")).setPreferredLocation(new Point(386, 626));
-        ((ViewableComponent)withName("VM #4")).setPreferredLocation(new Point(791, 627));
-        ((ViewableComponent)withName("VM #1")).setPreferredLocation(new Point(198, 623));
+        ((ViewableComponent)withName("User #2")).setPreferredLocation(new Point(361, 67));
     }
 }

@@ -1,4 +1,4 @@
-package RAUDT.RoundRobin;
+package RAUDT.RoundRobinOnly;
 import GenCol.*;
 
 public class Info extends entity

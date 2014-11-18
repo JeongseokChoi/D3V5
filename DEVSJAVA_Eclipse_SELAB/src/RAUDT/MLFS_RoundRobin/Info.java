@@ -1,4 +1,4 @@
-package RAUDT.MLFS;
+package RAUDT.MLFS_RoundRobin;
 import GenCol.*;
 
 public class Info extends entity
@@ -30,9 +30,11 @@ public class Info extends entity
 		queue_length = 0;
 	}
 	
-	public Info(int _queue_length)
+	public Info(int _vm_id, int _queue_length)
 	{
 		super("queue_length: " + _queue_length);
+		
+		vm_id = _vm_id;
 		
 		CPU = 0;
 		RAM = 0;

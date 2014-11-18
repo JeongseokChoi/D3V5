@@ -1,4 +1,4 @@
-package RAUDT.MLFS;
+package RAUDT.MLFS_RoundRobin;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
@@ -23,6 +23,7 @@ public class VM extends ViewableAtomic
 		addInport("in");
 		addOutport("done");
 		addOutport("vm_info");
+		addOutport("q_length");
 		addOutport("out");
 		
 		info = _info;
@@ -92,7 +93,7 @@ public class VM extends ViewableAtomic
 				}
 				
 				tmp_sigma = processing_time;
-				holdIn("sending Q len", 0);
+				holdIn("busy", processing_time);
 			}
 			else
 			{
@@ -125,10 +126,12 @@ public class VM extends ViewableAtomic
 		{
 			m.add(makeContent("out", job));
 			m.add(makeContent("done", info));
+			if (q.size() > 0)
+				m.add(makeContent("q_length", new Info(info.vm_id, q.size() - 1)));
 		}
 		else if (phaseIs("sending Q len"))
 		{
-			m.add(makeContent("vm_info", new Info(q.size())));
+			m.add(makeContent("q_length", new Info(info.vm_id, q.size())));
 		}
 		return m;
 	}

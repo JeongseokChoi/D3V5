@@ -1,4 +1,4 @@
-package RAUDT.RoundRobin;
+package RAUDT.RoundRobinRAUDT;
 import genDevs.modeling.*;
 import GenCol.*;
 import simView.*;
@@ -6,6 +6,8 @@ import simView.*;
 
 public class JobAllocator extends ViewableAtomic
 {
+	protected Queue q;
+	
 	protected int vm_count;
 	protected char[] vm_type;
 	protected boolean[] vm_available;
@@ -38,6 +40,8 @@ public class JobAllocator extends ViewableAtomic
   
 	public void initialize()
 	{
+		q = new Queue();
+		
 		Queue_CPU = new Queue();
 		Queue_RAM = new Queue();
 		Queue_NetResponse = new Queue();
@@ -73,13 +77,32 @@ public class JobAllocator extends ViewableAtomic
 				}
 			}
 		}
+		else
+		{
+			for (int i = 0; i < x.getLength(); i++)
+			{
+				if (messageOnPort(x, "in", i))
+				{
+					q.add(x.getValOnPort("in", i));
+				}
+			}
+		}
 	}
 
 	public void deltint()
 	{
 		if (phaseIs("busy"))
 		{
-			holdIn("passive", INFINITY);
+			if (q.size() > 0)
+			{
+				job = (Job)q.removeFirst();
+				
+				holdIn("busy", processing_time);
+			}
+			else
+			{
+				holdIn("passive", INFINITY);
+			}
 		}
 	}
 
@@ -114,6 +137,7 @@ public class JobAllocator extends ViewableAtomic
 		return
 		super.getTooltipText()
 		+ "\n" + "job: " + job.getName()
+		+ "\n" + "queue: " + q.toString()
 		+ "\n" + "Queue_CPU: " + Queue_CPU.toString()
 		+ "\n" + "Queue_RAM: " + Queue_RAM.toString()
 		+ "\n" + "Queue_NetResponse: " + Queue_NetResponse.toString();

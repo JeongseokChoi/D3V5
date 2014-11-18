@@ -1,4 +1,4 @@
-package RAUDT.RoundRobin;
+package RAUDT.RoundRobinRAUDT;
 import GenCol.*;
 
 public class Job extends entity

@@ -1,4 +1,4 @@
-package RAUDT.RoundRobin;
+package RAUDT.RoundRobinRAUDT;
 import simView.*;
 import genDevs.modeling.*;
 import GenCol.*;

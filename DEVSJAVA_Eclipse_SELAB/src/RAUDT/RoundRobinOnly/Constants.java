@@ -1,4 +1,4 @@
-package RAUDT.RAUDT;
+package RAUDT.RoundRobinOnly;
 import java.util.Random;
 
 public class Constants
